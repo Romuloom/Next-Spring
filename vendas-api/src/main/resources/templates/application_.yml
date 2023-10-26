@@ -1,0 +1,10 @@
+spring:
+    datasource:
+        url:jdbc: postgresql://localhost:5432/vendas
+        username: postgres
+        password: postgres
+    jpa:
+        database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+    port: 8081
