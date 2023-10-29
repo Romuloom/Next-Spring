@@ -14,7 +14,7 @@ export const ListagemProdutos: React.FC = () => {
     return (
         <Layout titulo="Produtos">
             <Link href="/cadastros/produtos">
-                <button className="button is-info">Novo</button>
+                <button className="button is-success is-rounded">Novo</button>
             </Link>
             <br/>
             <Loader show={!result}></Loader>
