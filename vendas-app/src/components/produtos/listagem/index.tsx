@@ -15,13 +15,15 @@ export const ListagemProdutos: React.FC = () => {
 
     const service = useProdutoService();
 
-    const [messages, setmessages] = useState<Array<Alert>>([])
+    //const [messages, setmessages] = useState<Array<Alert>>([])
+    const [ messages, setMessages ] = useState<Array<Alert>>([])
 
     const { data: result } = useSWR<AxiosResponse<Produto>>('api/produtos', (url: string) => httpClient.get(url))
 
-    const [lista, setLista] = useState<Produto[]>()
+    const [lista, setLista] = useState<Produto[]>([])
 
-    useEffect(()=>{
+    useEffect(() => {
+        // @ts-ignore
         setLista(result?.data || [])
     }, [result])
 
@@ -32,11 +34,24 @@ export const ListagemProdutos: React.FC = () => {
 
     const deletar = (produto: Produto) => {
         service.deletar(produto.id).then(response => {
+            setMessages([
+                {  tipo: "success", texto: "Produto excluido com sucesso!" }
+            ])
+            const listaAlterada: Produto[] = lista?.filter( p => p.id !== produto.id )
+            setLista(listaAlterada)
+        })
+    }
+
+    /*const deletar = (produto: Produto) => {
+        service.deletar(produto.id).then(response => {
             setmessages([
                 { tipo: "success", texto: "Produto excluido com sucesso!" }
             ])
+            const listaAlterada: Produto[] = lista?.filter(p => p.id !== produto.id )
+            setLista(listaAlterada)
         })
-    }
+    }*/
+
 
     return (
         <Layout titulo="Produtos" mensagens={messages}>
@@ -46,7 +61,7 @@ export const ListagemProdutos: React.FC = () => {
             <br />
             <Loader show={!result}></Loader>
 
-            <TabelaProdutos onEdit={editar} onDelet={deletar} produtos={result?.data || []} />
+            <TabelaProdutos onEdit={editar} onDelet={deletar} produtos={lista} />
         </Layout>
     )
 }

@@ -45,7 +45,7 @@ public class ProdutoController {
         return ProdutoDTO.fromModel(entidadeProduto);
     }
 
-    @DeleteMapping
+    @DeleteMapping("{id}")
     public ResponseEntity<Void> Deletar(@PathVariable Long id) {
         Optional<ProdutoEntity> produtoExistente = repository.findById(id);
         if (produtoExistente.isEmpty()) {
