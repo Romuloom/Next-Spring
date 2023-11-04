@@ -2,6 +2,7 @@ import {httpClient} from 'app/http'
 import {Produto} from 'app/models/produtos'
 import {AxiosResponse} from 'axios'
 import produtos from "../../pages/cadastros/produtos";
+import { promises } from 'dns';
 
 const resourceURL: string = "/api/produtos"
 
@@ -16,8 +17,22 @@ export const useProdutoService = () => {
         await httpClient.put<Produto>(url, produto)
     }
 
+    const carrgarProduto = async (id: any): Promise<Produto> => {
+        const url: string = `${resourceURL}/${id}`;
+        const response:AxiosResponse<Produto> = await httpClient.get(url);
+        return response.data;
+
+    }
+
+    const deletar =async (id:any) => {
+        const url: string = `${resourceURL}/${id}`;
+        await httpClient.delete(url)
+    }
+
     return {
         salvar,
-        atualizar
+        atualizar,
+        carrgarProduto,
+        deletar
     }
 }

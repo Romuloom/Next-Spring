@@ -1,5 +1,3 @@
-
-
 export const converterEmBigDecimal = (value) : number => {
     if(!value){
         return 0;

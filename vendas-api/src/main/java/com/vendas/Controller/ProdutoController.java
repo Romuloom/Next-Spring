@@ -21,12 +21,22 @@ public class ProdutoController {
     private ProdutoRepository repository;
 
     @GetMapping
-    public List<ProdutoDTO>getLista(){
-        return repository.findAll().stream().map(p-> ProdutoDTO.fromModel(p)).collect(Collectors.toList());
+    public List<ProdutoDTO> getLista() {
+        return repository.findAll().stream().map(p -> ProdutoDTO.fromModel(p)).collect(Collectors.toList());
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity<ProdutoDTO> getById(@PathVariable Long id) {
+        Optional<ProdutoEntity> produtoExistente = repository.findById(id);
+        if (produtoExistente.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        var produto = produtoExistente.map(ProdutoDTO::fromModel).get();
+        return ResponseEntity.ok(produto);
     }
 
     @PostMapping
-    public ProdutoDTO salvar(@RequestBody ProdutoDTO produto){
+    public ProdutoDTO salvar(@RequestBody ProdutoDTO produto) {
 
         ProdutoEntity entidadeProduto = produto.toModel();
 
@@ -34,11 +44,21 @@ public class ProdutoController {
 
         return ProdutoDTO.fromModel(entidadeProduto);
     }
-    
-    @PutMapping("{id}")
-    public ResponseEntity<Void> Atualizar(@PathVariable Long id, @RequestBody ProdutoDTO produto){
+
+    @DeleteMapping
+    public ResponseEntity<Void> Deletar(@PathVariable Long id) {
         Optional<ProdutoEntity> produtoExistente = repository.findById(id);
-        if(produtoExistente.isEmpty()){
+        if (produtoExistente.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        repository.delete(produtoExistente.get());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<Void> Atualizar(@PathVariable Long id, @RequestBody ProdutoDTO produto) {
+        Optional<ProdutoEntity> produtoExistente = repository.findById(id);
+        if (produtoExistente.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         ProdutoEntity entidadeProduto = produto.toModel();

@@ -1,26 +1,29 @@
-import {Layout, Input,Message} from 'components';
-import {useState} from 'react';
-import {useProdutoService} from 'app/services'
-import {Produto} from 'app/models/produtos'
-import {converterEmBigDecimal} from 'app/util/money'
-import {Alert} from 'components/common/message'
+import { Layout, Input, Message } from 'components';
+import { useState, useEffect } from 'react';
+import { useProdutoService } from 'app/services'
+import { Produto } from 'app/models/produtos'
+import { converterEmBigDecimal, formatReal } from 'app/util/money'
+import { Alert } from 'components/common/message'
 import Link from "next/link"
 import * as yup from 'yup';
+import { useRouter } from 'next/router'
+
+
 
 const msgCampoObrigatorio = "Campo Obrigatorio"
 
 const validationSchema = yup.object().shape({
-    sku:yup.string().trim().required(msgCampoObrigatorio),
-    preco:yup.number().required(msgCampoObrigatorio).moreThan(0, "Valor deve ser mair que 0,00"),
-    nome:yup.string().trim().required(msgCampoObrigatorio),
-    desc:yup.string().trim().required(msgCampoObrigatorio)
+    sku: yup.string().trim().required(msgCampoObrigatorio),
+    preco: yup.number().required(msgCampoObrigatorio).moreThan(0, "Valor deve ser mair que 0,00"),
+    nome: yup.string().trim().required(msgCampoObrigatorio),
+    desc: yup.string().trim().required(msgCampoObrigatorio)
 })
 
 interface FormErros {
     sku?: String,
-    preco?:String,
-    nome?:String,
-    desc?:String
+    preco?: String,
+    nome?: String,
+    desc?: String
 }
 
 export const CadastroProdutos: React.FC = () => {
@@ -34,10 +37,30 @@ export const CadastroProdutos: React.FC = () => {
     const [cadastro, setCadastro] = useState<string>('')
     const [messages, setmessages] = useState<Array<Alert>>([])
     const [errors, setErrors] = useState<FormErros>({})
+    const router = useRouter();
+    const { id: queryId } = router.query
+
+    useEffect(() => {
+
+        if (queryId) {
+            service.carrgarProduto(queryId).then(produtoEncontrado => {
+                console.log(produtoEncontrado)
+                setId(produtoEncontrado.id || '')
+                setSku(produtoEncontrado.sku || '')
+                setNome(produtoEncontrado.nome || '')
+                setDesc(produtoEncontrado.desc || '')
+                setpreco(formatReal(`${produtoEncontrado.preco}`) )
+                setCadastro(produtoEncontrado.cadastro|| '')
+            })
+        }
+
+
+
+    }, [queryId])
 
     const submit = () => {
         const produto: Produto = {
-            id:id,
+            id: id,
             sku: sku,
             preco: converterEmBigDecimal(preco),
             nome: nome,
@@ -49,9 +72,9 @@ export const CadastroProdutos: React.FC = () => {
             if (id) {
 
                 service.atualizar(produto).then(response => setmessages([{
-                    tipo:"success", texto:"Produto atualizado com sucesso"
+                    tipo: "success", texto: "Produto atualizado com sucesso"
                 }]))
-    
+
             } else {
                 service.salvar(produto).then(produtoResposta => {
                     // @ts-ignore
@@ -59,14 +82,14 @@ export const CadastroProdutos: React.FC = () => {
                     // @ts-ignore
                     setCadastro(produtoResposta.cadastro)
                     setmessages([{
-                        tipo:"success", texto:"Produto salvo com sucesso"
+                        tipo: "success", texto: "Produto salvo com sucesso"
                     }])
                 })
             }
-    
+
         }).catch(err => {
             const field = err.path
-            const message =  err.message
+            const message = err.message
 
             setErrors({
                 [field]: message
@@ -83,41 +106,41 @@ export const CadastroProdutos: React.FC = () => {
             {id &&
                 <div className="columns">
 
-                    <Input columnClasses='is-half' id='inputId' label='Código:' value={id} disabled={true}/>
+                    <Input columnClasses='is-half' id='inputId' label='Código:' value={id} disabled={true} />
 
                     <Input columnClasses='is-half' id='inputDataCastro' label='Data Cadastro:' value={cadastro}
-                           disabled={true}/>
+                        disabled={true} />
                 </div>
             }
 
             <div className="columns">
                 <Input columnClasses='is-half'
-                       id='inputSku' label='SKU:*'
-                       placeholder='Digite o SKU do produto'
-                       value={sku}
-                       onChange={setSku}
-                       error={errors.sku}
-                       />
+                    id='inputSku' label='SKU:*'
+                    placeholder='Digite o SKU do produto'
+                    value={sku}
+                    onChange={setSku}
+                    error={errors.sku}
+                />
 
                 <Input columnClasses='is-half'
-                       id='inputPreco'
-                       label='Preço:*'
-                       placeholder='Digite o Preço do produto'
-                       value={preco}
-                       onChange={setpreco} currency maxLength={16}
-                       error={errors.preco}
+                    id='inputPreco'
+                    label='Preço:*'
+                    placeholder='Digite o Preço do produto'
+                    value={preco}
+                    onChange={setpreco} currency maxLength={16}
+                    error={errors.preco}
                 />
 
             </div>
             <div className='columns'>
 
                 <Input columnClasses='is-full'
-                       id='inputNome'
-                       label='Nome:*'
-                       placeholder='Digite o Nome do produto'
-                       value={nome}
-                       onChange={setNome}
-                       error={errors.nome}/>
+                    id='inputNome'
+                    label='Nome:*'
+                    placeholder='Digite o Nome do produto'
+                    value={nome}
+                    onChange={setNome}
+                    error={errors.nome} />
 
             </div>
             <div className='columns'>
@@ -132,7 +155,7 @@ export const CadastroProdutos: React.FC = () => {
                             onChange={event => setDesc(event.target.value)}
                         />
                         {
-                            errors.desc && <p className= "help is-danger">{errors.desc}</p>
+                            errors.desc && <p className="help is-danger">{errors.desc}</p>
                         }
 
                     </div>
@@ -141,11 +164,11 @@ export const CadastroProdutos: React.FC = () => {
 
             <div className='field is-grouped'>
                 <div className='control'>
-                    <button onClick={submit} className='button is-link is-rounded'>{id ? 'Atualizar' : 'Salvar'}</button>
+                    <button onClick={submit} className='button is-link '>{id ? 'Atualizar' : 'Salvar'}</button>
                 </div>
                 <div className='control'>
                     <Link href='/consultas/produtos'>
-                    <button className='button is-rounded'>Voltar</button>
+                        <button className='button'>Voltar</button>
                     </Link>
                 </div>
             </div>

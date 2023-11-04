@@ -44,8 +44,8 @@ const ProdutoRow: React.FC<ProdutoRowProps> = ({ produto, onEdit, onDelet }) => 
             <td>{produto.preco}</td>
             <td >
                 <div className="buttons is-spaced">
-                    <button onClick={e => onEdit(produto)} className="button is-info   is-rounded">Editar</button>
-                    <button onClick={e => onDelet(produto)} className="button is-danger is-rounded">Deletar</button>
+                    <button onClick={e => onEdit(produto)} className="button is-info">Editar</button>
+                    <button onClick={e => onDelet(produto)} className="button is-danger">Deletar</button>
                 </div>
             </td>
         </tr>
