@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { Produto } from "app/models/produtos"
 
 interface TabelaProdutosProps {
     produtos: Array<Produto>;
     onEdit: (produto: Produto) => void;
-    onDelet: (produto: Produto) => void
+    onDelete: (produto:Produto) => void;
 }
 
-export const TabelaProdutos: React.FC<TabelaProdutosProps> = ({ produtos, onEdit, onDelet }) => {
+export const TabelaProdutos: React.FC<TabelaProdutosProps> = ({ produtos, onEdit, onDelete }) => {
+
+
 
     return (
         <table className="table is-hoverable">
@@ -22,7 +24,7 @@ export const TabelaProdutos: React.FC<TabelaProdutosProps> = ({ produtos, onEdit
             </thead>
             <tbody>
                 {
-                    produtos.map(produto => <ProdutoRow onEdit={onEdit} onDelet={onDelet} key={produto.id} produto={produto} />)
+                    produtos.map(produto => <ProdutoRow onEdit={onEdit} onDelete={onDelete} key={produto.id} produto={produto} />)
                 }
             </tbody>
         </table>
@@ -32,20 +34,45 @@ export const TabelaProdutos: React.FC<TabelaProdutosProps> = ({ produtos, onEdit
 interface ProdutoRowProps {
     produto: Produto;
     onEdit: (produto: Produto) => void;
-    onDelet: (produto: Produto) => void
+    onDelete: (produto: Produto) => void
 }
 
-const ProdutoRow: React.FC<ProdutoRowProps> = ({ produto, onEdit, onDelet }) => {
+const ProdutoRow: React.FC<ProdutoRowProps> = ({ produto, onEdit, onDelete }) => {
+
+    const [deletando, setDeletando] = useState<boolean>(false);
+
+    const onDeleteClick = (produto: Produto) => {
+        if (deletando) {
+            onDelete(produto)
+            setDeletando(false)
+        } else {
+            setDeletando(true)
+        }
+    }
+
+    const cancelaDelete = () => setDeletando(false);
+
+    1
     return (
         <tr>
-            <td>{produto.id}</td>
+            <td>{produto.id}</td>   
             <td>{produto.sku}</td>
             <td>{produto.nome}</td>
             <td>{produto.preco}</td>
             <td >
                 <div className="buttons is-spaced">
-                    <button onClick={e => onEdit(produto)} className="button is-info">Editar</button>
-                    <button onClick={e => onDelet(produto)} className="button is-danger">Deletar</button>
+                    {!deletando &&
+                        <button onClick={e => onEdit(produto)} className="button is-info">Editar</button>
+                    }
+
+                    <button onClick={e => onDeleteClick(produto)} className="button is-danger">{deletando ? "Comfirmar" : "Deletar"}</button>
+
+                    {deletando &&
+                        <button onClick={cancelaDelete} className="button">Cancelar</button>
+                    }
+
+
+
                 </div>
             </td>
         </tr>
